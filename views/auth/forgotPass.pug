@@ -1,0 +1,20 @@
+extends ../layout/index
+
+block content
+    div.py-10
+        h1.text-4xl.my-10.font-extrabold.text-center Bienes
+            span.font-normal Raices
+        h2.text-center.text-3xl.font-extrabold= page
+        div.mt-8.mx-auto.max-w-md
+            div.bg-white.py-8.px-4.shadow
+                form(action="").space-y-5
+
+                    div
+                        label(for="email").block.text-sm.uppercase.text-gray-500.mb-2.font-bold E-mail
+                        input(type="email" placeholder="ejemplo@ejemplo.com" name="email")#email.w-full.px-3.py-4.border.border-gray-300.rounded-md.placeholder-gray-400
+
+                    div.flex.items-center.justify-between
+                        a(href="/auth/login").text-gray-500.text-xs ¿Ya tienes cuenta? Inicia Sesión
+                        a(href="/auth/register").text-gray-500.text-xs ¿No tienes cuenta? Registrate.s
+
+                    input(type="submit" value="Enviar Instrucciones" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 cursor-pointer rounded-md")
