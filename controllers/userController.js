@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import { check, validationResult } from "express-validator";
+import { generateId } from "../helpers/tokens.js";
 
 const formLogin = (request, response) => {
     response.render("auth/login.pug", {
@@ -25,8 +26,6 @@ const register = async (request, response) => {
     let result = validationResult(request);
     response.json(result.array()); */
     let result = validationResult(request);
-    console.log(request.body.password);
-
     const existsUser = await User.findOne({ where: { email: request.body.email } });
 
     if (existsUser) {
@@ -52,7 +51,12 @@ const register = async (request, response) => {
     }
 
 
-    const UserToRegister = await User.create(request.body);
+    const UserToRegister = await User.create({
+        name: request.body.name,
+        email: request.body.email,
+        password: request.body.password,
+        token: generateId()
+    });
     response.json(UserToRegister);
 
 }
