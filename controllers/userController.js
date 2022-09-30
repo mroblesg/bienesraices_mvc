@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import { check, validationResult } from "express-validator";
 import { generateId } from "../helpers/tokens.js";
+import { registerEmail } from "../helpers/email.js";
+import { compareSync } from "bcrypt";
 
 const formLogin = (request, response) => {
     response.render("auth/login.pug", {
@@ -9,13 +11,15 @@ const formLogin = (request, response) => {
 };
 
 const formRegister = (request, response) => {
+
     response.render("auth/register.pug", {
-        page: "Crear Cuenta"
+        page: "Crear Cuenta",
+        csrfToken: request.csrfToken()
     });
 };
 
 const register = async (request, response) => {
-    
+
     //Validación
     await check("name").notEmpty().withMessage("El nombre es obligatorio").run(request);
     await check("email").isEmail().withMessage("Email debe escribirse correctamente").run(request);
@@ -31,11 +35,12 @@ const register = async (request, response) => {
     if (existsUser) {
         return response.render("auth/register", {
             page: "Crear cuenta",
-            errors: [{msg: "El usuario ya está registrado"}],
+            errors: [{ msg: "El usuario ya está registrado" }],
             user: {
                 name: request.body.name,
                 email: request.body.email
-            }
+            },
+            csrfToken: request.csrfToken()
         });
     }
 
@@ -46,10 +51,10 @@ const register = async (request, response) => {
             user: {
                 name: request.body.name,
                 email: request.body.email
-            }
+            },
+            csrfToken: request.csrfToken()
         });
     }
-
 
     const UserToRegister = await User.create({
         name: request.body.name,
@@ -57,8 +62,17 @@ const register = async (request, response) => {
         password: request.body.password,
         token: generateId()
     });
-    response.json(UserToRegister);
 
+    registerEmail({
+        name: UserToRegister.name,
+        email: UserToRegister.email,
+        token: UserToRegister.token
+    });
+
+    response.render("templates/message", {
+        page: "Valida tu Cuenta",
+        message: "Hemos enviado un email de confirmación, presiona en el enlace."
+    });
 }
 
 const formForgotPass = (request, response) => {
@@ -67,9 +81,38 @@ const formForgotPass = (request, response) => {
     });
 };
 
+const confirmMail = async (request, response) => {
+
+    const user = await User.findOne({ where: { token: request.params.token } });
+
+
+    if (!user) {
+
+        response.render("auth/confirmAccount", {
+            page: "Error al confirmar tu cuenta",
+            message: "Hubo un error al confirmar tu cuenta, inténtalo de nuevo",
+            error: true
+        });
+
+    } else {
+
+        user.token = null;
+        user.confirm = true;
+        await user.save();
+
+        response.render("auth/confirmAccount", {
+            page: "Cuenta confirmada",
+            message: "La cuenta ha sido confirmada de forma satisfactoria.",
+            error: false
+        });
+
+    }
+};
+
 export {
     formLogin,
     formRegister,
     register,
-    formForgotPass
+    formForgotPass,
+    confirmMail
 }

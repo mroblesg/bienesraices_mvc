@@ -13,6 +13,7 @@ block content
         div.mt-8.mx-auto.max-w-md
             div.bg-white.py-8.px-4.shadow
                 form(action="/auth/register" method="POST" noValidate).space-y-5
+                    input(type="hidden" name="_csrf" value=`${csrfToken}`)
                     div 
                         label(for="name").block.text-sm.uppercase.text-gray-500.mb-2.font-bold Tu Nombre
                         input(type="text" placeholder="Tu Nombre" name="name" value= user ? user.name : "")#name.w-full.px-3.py-4.border.border-gray-300.rounded-md.placeholder-gray-400
