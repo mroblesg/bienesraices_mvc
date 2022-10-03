@@ -1,14 +1,18 @@
 import express from "express";
-import { confirmMail, formForgotPass, formLogin, formRegister, register } from "../controllers/userController.js";
+import { confirmMail, formForgotPass, formLogin, formRegister, register, resetPass, checkToken, setNewPassword, authenticate } from "../controllers/userController.js";
 
 const router = express.Router();
 
 
 router.get("/login", formLogin);
+router.post("/login", authenticate);
 router.get("/register", formRegister);
 router.post("/register", register);
 router.get("/forgot", formForgotPass);
+router.post("/forgot", resetPass);
 router.get("/confirm/:token", confirmMail);
+router.get("/forgot/:token", checkToken);
+router.post("/forgot/:token", setNewPassword);
 
 /* 
 router.route("/")
