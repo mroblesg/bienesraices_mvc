@@ -1,5 +1,6 @@
 import express from "express";
 import userRoutes from "./routes/userRoutes.js";
+import propertiesRoutes from "./routes/propertiesRoutes.js";
 import db from "./config/db.js";
 import cookieParser from "cookie-parser";
 import csrf from "csurf";
@@ -32,4 +33,5 @@ app_express.listen(port, () => {
 });
 
 app_express.use("/auth", userRoutes);
+app_express.use("/", propertiesRoutes);
 app_express.use( express.static("public") );

@@ -1,8 +1,9 @@
 import User from "../models/User.js";
 import { check, validationResult } from "express-validator";
-import { generateToken } from "../helpers/tokens.js";
+import { generateJwt, generateToken } from "../helpers/tokens.js";
 import { registerEmail, emailForgotPass } from "../helpers/email.js";
 import bcrypt from "bcrypt";
+import Jwt from "jsonwebtoken";
 
 const formLogin = (request, response) => {
     response.render("auth/login.pug", {
@@ -52,6 +53,15 @@ const authenticate = async (request, response) => {
             csrfToken: request.csrfToken()
         });
     }
+
+    const token = generateJwt(user.id, user.name);
+
+    console.log(token);
+
+    return response.cookie("_token", token, {
+        httpOnly: true, //This blocks the usage of the cookies from chrome's js console.
+        // secure: true, //Only allows cookies con https connections
+    }).redirect("/my-properties");
 
 };
 
